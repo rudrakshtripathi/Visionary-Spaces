@@ -6,7 +6,7 @@ import { Download, ImageOff, Image as ImageIconLucide, Expand } from 'lucide-rea
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { LoadingSpinner } from './LoadingSpinner';
-import { BeforeAfterSlider } from './BeforeAfterSlider'; // Import the new component
+import { BeforeAfterSlider } from './BeforeAfterSlider';
 import { useEffect, useState } from 'react';
 
 interface DesignDisplayProps {
@@ -14,7 +14,7 @@ interface DesignDisplayProps {
   isLoading: boolean;
   hasAttemptedGeneration: boolean;
   onImageClick: (imageUrl: string) => void;
-  uploadedImage: string | null; // Add uploadedImage prop
+  uploadedImage: string | null; 
 }
 
 const inspiringQuotes = [
@@ -37,7 +37,7 @@ export function DesignDisplay({ designs, isLoading, hasAttemptedGeneration, onIm
     if (isLoading) {
       const intervalId = setInterval(() => {
         setCurrentQuote(inspiringQuotes[Math.floor(Math.random() * inspiringQuotes.length)]);
-      }, 3000); // Change quote every 3 seconds
+      }, 3000); 
       return () => clearInterval(intervalId);
     }
   }, [isLoading]);
@@ -56,11 +56,11 @@ export function DesignDisplay({ designs, isLoading, hasAttemptedGeneration, onIm
   if (isLoading) {
     return (
       <Card className="flex-1 w-full flex flex-col items-center justify-center min-h-[400px] shadow-lg">
-        <CardHeader className="text-center">
+        <CardHeader> 
           <CardTitle className="text-2xl mb-2">Conjuring Your Visions...</CardTitle>
           <CardDescription className="italic text-muted-foreground min-h-[40px]">{currentQuote}</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex justify-center"> 
           <LoadingSpinner size={64} />
         </CardContent>
       </Card>
@@ -69,9 +69,9 @@ export function DesignDisplay({ designs, isLoading, hasAttemptedGeneration, onIm
 
   if (!hasAttemptedGeneration && designs.length === 0) {
     return (
-       <Card className="flex-1 w-full flex flex-col items-center justify-center min-h-[400px] bg-secondary/30 border-dashed">
-        <CardHeader className="text-center">
-            <ImageIconLucide className="w-16 h-16 text-muted-foreground mx-auto mb-4" data-ai-hint="interior design blueprint" />
+       <Card className="flex-1 w-full flex flex-col items-start justify-center min-h-[400px] bg-secondary/30 border-dashed"> 
+        <CardHeader> 
+            <ImageIconLucide className="w-16 h-16 text-muted-foreground mb-4" data-ai-hint="interior design blueprint" /> 
             <CardTitle className="text-2xl">Your Designs Will Appear Here</CardTitle>
             <CardDescription>Upload an image and set your preferences to get started.</CardDescription>
         </CardHeader>
@@ -81,9 +81,9 @@ export function DesignDisplay({ designs, isLoading, hasAttemptedGeneration, onIm
   
   if (hasAttemptedGeneration && designs.length === 0 && !isLoading) {
     return (
-      <Card className="flex-1 w-full flex flex-col items-center justify-center min-h-[400px] shadow-lg">
-        <CardHeader className="text-center">
-          <ImageOff className="w-16 h-16 text-destructive mx-auto mb-4" />
+      <Card className="flex-1 w-full flex flex-col items-start justify-center min-h-[400px] shadow-lg"> 
+        <CardHeader> 
+          <ImageOff className="w-16 h-16 text-destructive mb-4" /> 
           <CardTitle className="text-2xl">No Designs Generated</CardTitle>
           <CardDescription>We couldn't generate designs this time. Please try adjusting your inputs or try again later.</CardDescription>
         </CardHeader>
@@ -96,7 +96,7 @@ export function DesignDisplay({ designs, isLoading, hasAttemptedGeneration, onIm
     return (
       <div className="w-full">
         <h2 className="text-2xl font-semibold mb-6 text-foreground">Generated Designs</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 gap-6"> {/* Adjusted to 2 columns for xl and 2xl for better fit */}
           {designs.map((designUri, index) => (
             <Card key={index} className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col">
               <CardContent className="p-0 relative flex-grow">
@@ -108,7 +108,6 @@ export function DesignDisplay({ designs, isLoading, hasAttemptedGeneration, onIm
                     altAfter={`Generated Design ${index + 1}`}
                   />
                 ) : (
-                  // Fallback if original image is somehow not available for the slider
                   <div className="aspect-video relative bg-muted">
                     <Image
                       src={designUri}

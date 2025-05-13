@@ -106,7 +106,6 @@ export default function VisionarySpacesPage() {
     setUploadedImage(dataUri);
     setGeneratedDesigns([]); 
     setHasAttemptedGeneration(false);
-    // Kick off AI analysis
     performAiAnalysis(dataUri);
   };
 
