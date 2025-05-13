@@ -22,7 +22,7 @@ export default function WelcomePage() {
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen p-4 overflow-hidden">
       <Image
-        src="https://picsum.photos/1920/1080"
+        src="https://images.unsplash.com/photo-1486946255434-2466348c2166?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMnx8RnJvbnQlMjB2aWV3JTIwb2YlMjByb29tJTIwd2l0aCUyMGElMjBiZWQlMjB8ZW58MHx8fHwxNzQ3MTQ0MTk0fDA&ixlib=rb-4.1.0&q=80&w=1080"
         alt="Abstract bedroom background"
         layout="fill"
         objectFit="cover"
