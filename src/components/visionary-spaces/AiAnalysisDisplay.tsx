@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -35,7 +36,7 @@ export function AiAnalysisDisplay({
             <CardHeader>
                 <CardTitle className="flex items-center">
                 <Eye className="mr-2 h-5 w-5 text-primary" />
-                AI Analysis
+                Our AI Analysis !!
                 </CardTitle>
                 <CardDescription>
                 Upload an image to see AI insights.
@@ -54,7 +55,7 @@ export function AiAnalysisDisplay({
       <CardHeader>
         <CardTitle className="flex items-center">
           <Eye className="mr-2 h-5 w-5 text-primary" />
-          AI Analysis
+          Our AI Analysis !!
         </CardTitle>
         <CardDescription>
           {isDetectingRoom || isDetectingObjects ? "Analyzing your image..." : "Here's what the AI found in your image."}
