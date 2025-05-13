@@ -50,13 +50,18 @@ const detectRoomTypeFlow = ai.defineFlow(
     outputSchema: DetectRoomTypeOutputSchema,
   },
   async (input) => {
-    const {output} = await detectRoomTypePrompt(input);
-    if (output && ROOM_TYPES.includes(output.roomType as any)) {
-        return output;
+    try {
+      const {output} = await detectRoomTypePrompt(input);
+      // Check if output and output.roomType are valid and if roomType is in our list
+      if (output && typeof output.roomType === 'string' && ROOM_TYPES.includes(output.roomType as any)) {
+          return output;
+      }
+      console.warn('DetectRoomTypePrompt did not return a valid or recognized room type. Returning empty string.');
+      return { roomType: "" };
+    } catch (error) {
+      console.error('Error in detectRoomTypeFlow:', error);
+      // Return a default valid output in case of any error
+      return { roomType: "" };
     }
-    // Fallback or error if the model returns something unexpected
-    // For now, returning a generic or empty response if not valid.
-    // A more robust approach might be to retry or log an issue.
-    return { roomType: "" }; // Or throw an error
   }
 );

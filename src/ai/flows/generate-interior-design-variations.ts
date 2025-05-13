@@ -60,34 +60,38 @@ const generateInteriorDesignVariationsFlow = ai.defineFlow(
   },
   async input => {
     const redesignedImages: string[] = [];
-    for (let i = 0; i < 5; i++) {
-      // Improved text prompt for image generation
-      const imagePromptText = `Generate a high-quality, photorealistic image of a ${input.roomType}. This room should be redesigned in the ${input.interiorDesignStyle} style. ${
-        input.designDescription
-          ? `Please incorporate these specific details: "${input.designDescription}".`
-          : 'Focus on a creative and inspiring interpretation of the style.'
-      } Pay attention to realistic lighting, textures, and appropriately scaled furniture. The overall scene should be aesthetically pleasing and accurately represent the requested design.`;
-      
-      const {media} = await ai.generate({
-        // IMPORTANT: ONLY the googleai/gemini-2.0-flash-exp model is able to generate images. You MUST use exactly this model to generate images.
-        model: 'googleai/gemini-2.0-flash-exp',
-        prompt: [
-          {media: {url: input.photoDataUri}},
-          {text: imagePromptText},
-        ],
-        config: {
-          responseModalities: ['TEXT', 'IMAGE'], // MUST provide both TEXT and IMAGE, IMAGE only won't work
-        },
-      });
-      if (media && media.url) {
-        redesignedImages.push(media.url);
-      } else {
-        // Handle cases where image generation might fail for one iteration
-        console.warn(`Image generation failed for iteration ${i + 1}. Skipping.`);
+    try {
+      for (let i = 0; i < 5; i++) {
+        // Improved text prompt for image generation
+        const imagePromptText = `Generate a high-quality, photorealistic image of a ${input.roomType}. This room should be redesigned in the ${input.interiorDesignStyle} style. ${
+          input.designDescription
+            ? `Please incorporate these specific details: "${input.designDescription}".`
+            : 'Focus on a creative and inspiring interpretation of the style.'
+        } Pay attention to realistic lighting, textures, and appropriately scaled furniture. The overall scene should be aesthetically pleasing and accurately represent the requested design.`;
+        
+        const {media} = await ai.generate({
+          // IMPORTANT: ONLY the googleai/gemini-2.0-flash-exp model is able to generate images. You MUST use exactly this model to generate images.
+          model: 'googleai/gemini-2.0-flash-exp',
+          prompt: [
+            {media: {url: input.photoDataUri}},
+            {text: imagePromptText},
+          ],
+          config: {
+            responseModalities: ['TEXT', 'IMAGE'], // MUST provide both TEXT and IMAGE, IMAGE only won't work
+          },
+        });
+        if (media && media.url) {
+          redesignedImages.push(media.url);
+        } else {
+          // Handle cases where image generation might fail for one iteration
+          console.warn(`Image generation failed for iteration ${i + 1}. Skipping.`);
+        }
       }
+      return {redesignedImages};
+    } catch (error) {
+        console.error('Error in generateInteriorDesignVariationsFlow:', error);
+        // Ensure a valid schema-compliant response in case of an unexpected error
+        return { redesignedImages: [] };
     }
-
-    return {redesignedImages};
   }
 );
-

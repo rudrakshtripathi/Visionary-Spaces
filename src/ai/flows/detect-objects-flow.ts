@@ -52,7 +52,17 @@ const detectObjectsFlow = ai.defineFlow(
     outputSchema: DetectObjectsOutputSchema,
   },
   async (input) => {
-    const {output} = await detectObjectsPrompt(input);
-    return output!;
+    try {
+      const {output} = await detectObjectsPrompt(input);
+      if (output && Array.isArray(output.detectedObjects)) {
+        return output;
+      }
+      console.warn('DetectObjectsPrompt did not return a valid output. Returning empty list for detected objects.');
+      return { detectedObjects: [] };
+    } catch (error) {
+      console.error('Error in detectObjectsFlow:', error);
+      // Return a default valid output in case of any error
+      return { detectedObjects: [] };
+    }
   }
 );
