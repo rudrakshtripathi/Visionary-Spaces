@@ -1,4 +1,3 @@
-
 'use client';
 
 import Image from 'next/image';
@@ -65,43 +64,49 @@ export function DesignDisplay({ designs, isLoading, hasAttemptedGeneration, onIm
   }
 
 
-  return (
-    <div className="w-full"> {/* Changed flex-1 to w-full */}
-      <h2 className="text-2xl font-semibold mb-6 text-foreground">Generated Designs</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {designs.map((designUri, index) => (
-          <Card key={index} className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 group">
-            <CardContent className="p-0 relative">
-              <div 
-                className="aspect-video relative bg-muted cursor-pointer"
-                onClick={() => onImageClick(designUri)}
-              >
-                <Image
-                  src={designUri}
-                  alt={`Generated Design ${index + 1}`}
-                  layout="fill"
-                  objectFit="cover"
-                  className="group-hover:scale-105 transition-transform duration-300"
-                  data-ai-hint="modern living room"
-                />
-                <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <Expand className="h-10 w-10 text-white" />
+  // When designs are present and not loading
+  if (designs.length > 0 && !isLoading) {
+    return (
+      <div className="w-full pt-0 md:pt-6"> {/* Adjusted padding: No top padding on mobile, pt-6 on md+ to align with CardHeaders */}
+        <h2 className="text-2xl font-semibold mb-6 text-foreground">Generated Designs</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {designs.map((designUri, index) => (
+            <Card key={index} className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 group">
+              <CardContent className="p-0 relative">
+                <div 
+                  className="aspect-video relative bg-muted cursor-pointer"
+                  onClick={() => onImageClick(designUri)}
+                >
+                  <Image
+                    src={designUri}
+                    alt={`Generated Design ${index + 1}`}
+                    layout="fill"
+                    objectFit="cover"
+                    className="group-hover:scale-105 transition-transform duration-300"
+                    data-ai-hint="modern living room"
+                  />
+                  <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <Expand className="h-10 w-10 text-white" />
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-            <CardFooter className="p-4 bg-card">
-              <Button
-                onClick={() => handleDownload(designUri, index)}
-                className="w-full"
-                variant="outline"
-              >
-                <Download className="mr-2 h-4 w-4" />
-                Download Design {index + 1}
-              </Button>
-            </CardFooter>
-          </Card>
-        ))}
+              </CardContent>
+              <CardFooter className="p-4 bg-card">
+                <Button
+                  onClick={() => handleDownload(designUri, index)}
+                  className="w-full"
+                  variant="outline"
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  Download Design {index + 1}
+                </Button>
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
+
+  // Fallback for any other unaccounted state, though unlikely to be hit with current logic
+  return null; 
 }
