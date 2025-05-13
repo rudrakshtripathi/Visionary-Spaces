@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react'; // Import useEffect
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -39,9 +40,10 @@ interface DesignFormProps {
   onSubmit: (data: DesignFormValues) => void;
   isLoading: boolean;
   hasUploadedImage: boolean;
+  detectedRoomType?: RoomType | null; // Add this prop
 }
 
-export function DesignForm({ onSubmit, isLoading, hasUploadedImage }: DesignFormProps) {
+export function DesignForm({ onSubmit, isLoading, hasUploadedImage, detectedRoomType }: DesignFormProps) {
   const form = useForm<DesignFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -50,6 +52,17 @@ export function DesignForm({ onSubmit, isLoading, hasUploadedImage }: DesignForm
       designDescription: "",
     },
   });
+
+  // Effect to update roomType field when detectedRoomType changes
+  useEffect(() => {
+    if (detectedRoomType && ROOM_TYPES.includes(detectedRoomType as any)) {
+      // Only update if different to avoid re-renders or if it's not already set by user
+      if (form.getValues('roomType') !== detectedRoomType) {
+        form.setValue('roomType', detectedRoomType, { shouldValidate: true, shouldDirty: true });
+      }
+    }
+  }, [detectedRoomType, form]);
+
 
   return (
     <Card>
@@ -66,7 +79,12 @@ export function DesignForm({ onSubmit, isLoading, hasUploadedImage }: DesignForm
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Room Type</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoading}>
+                  <Select 
+                    onValueChange={field.onChange} 
+                    value={field.value} // Ensure value is controlled
+                    defaultValue={field.value} // Keep defaultValue for initial render
+                    disabled={isLoading}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select a room type" />
@@ -93,7 +111,12 @@ export function DesignForm({ onSubmit, isLoading, hasUploadedImage }: DesignForm
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Interior Design Style</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoading}>
+                  <Select 
+                    onValueChange={field.onChange} 
+                    value={field.value} // Ensure value is controlled
+                    defaultValue={field.value} 
+                    disabled={isLoading}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select a design style" />
