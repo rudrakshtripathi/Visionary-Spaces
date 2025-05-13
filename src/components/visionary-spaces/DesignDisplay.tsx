@@ -28,7 +28,7 @@ export function DesignDisplay({ designs, isLoading, hasAttemptedGeneration, onIm
 
   if (isLoading) {
     return (
-      <Card className="flex-1 flex flex-col items-center justify-center min-h-[400px] shadow-lg animate-pulse">
+      <Card className="flex-1 w-full flex flex-col items-center justify-center min-h-[400px] shadow-lg animate-pulse">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Conjuring Your Visions...</CardTitle>
           <CardDescription>Our AI is hard at work crafting your new spaces. This might take a moment.</CardDescription>
@@ -42,7 +42,7 @@ export function DesignDisplay({ designs, isLoading, hasAttemptedGeneration, onIm
 
   if (!hasAttemptedGeneration && designs.length === 0) {
     return (
-       <Card className="flex-1 flex flex-col items-center justify-center min-h-[400px] bg-secondary/30 border-dashed">
+       <Card className="flex-1 w-full flex flex-col items-center justify-center min-h-[400px] bg-secondary/30 border-dashed">
         <CardHeader className="text-center">
             <ImageIconLucide className="w-16 h-16 text-muted-foreground mx-auto mb-4" data-ai-hint="interior design blueprint" />
             <CardTitle className="text-2xl">Your Designs Will Appear Here</CardTitle>
@@ -54,7 +54,7 @@ export function DesignDisplay({ designs, isLoading, hasAttemptedGeneration, onIm
   
   if (hasAttemptedGeneration && designs.length === 0 && !isLoading) {
     return (
-      <Card className="flex-1 flex flex-col items-center justify-center min-h-[400px] shadow-lg">
+      <Card className="flex-1 w-full flex flex-col items-center justify-center min-h-[400px] shadow-lg">
         <CardHeader className="text-center">
           <ImageOff className="w-16 h-16 text-destructive mx-auto mb-4" />
           <CardTitle className="text-2xl">No Designs Generated</CardTitle>
@@ -66,7 +66,7 @@ export function DesignDisplay({ designs, isLoading, hasAttemptedGeneration, onIm
 
 
   return (
-    <div className="flex-1">
+    <div className="w-full"> {/* Changed flex-1 to w-full */}
       <h2 className="text-2xl font-semibold mb-6 text-foreground">Generated Designs</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {designs.map((designUri, index) => (
