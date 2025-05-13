@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -7,6 +8,7 @@ import { Footer } from '@/components/visionary-spaces/Footer';
 import { ImageUpload } from '@/components/visionary-spaces/ImageUpload';
 import { DesignForm, type DesignFormValues } from '@/components/visionary-spaces/DesignForm';
 import { DesignDisplay } from '@/components/visionary-spaces/DesignDisplay';
+import { ImageModal } from '@/components/visionary-spaces/ImageModal';
 import { useToast } from '@/hooks/use-toast';
 
 export default function VisionarySpacesPage() {
@@ -14,6 +16,7 @@ export default function VisionarySpacesPage() {
   const [generatedDesigns, setGeneratedDesigns] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasAttemptedGeneration, setHasAttemptedGeneration] = useState(false);
+  const [selectedImageForModal, setSelectedImageForModal] = useState<string | null>(null);
   const { toast } = useToast();
 
   const handleImageUpload = (dataUri: string) => {
@@ -62,7 +65,7 @@ export default function VisionarySpacesPage() {
          toast({
           title: 'No Designs Returned',
           description: 'The AI didn\'t return any designs. Try adjusting your prompt.',
-          variant: 'default', // Changed from destructive to default as it's not a critical error
+          variant: 'default',
         });
       }
     } catch (error) {
@@ -76,6 +79,14 @@ export default function VisionarySpacesPage() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleOpenImageModal = (imageUrl: string) => {
+    setSelectedImageForModal(imageUrl);
+  };
+
+  const handleCloseImageModal = () => {
+    setSelectedImageForModal(null);
   };
 
   return (
@@ -100,11 +111,18 @@ export default function VisionarySpacesPage() {
               designs={generatedDesigns}
               isLoading={isLoading}
               hasAttemptedGeneration={hasAttemptedGeneration}
+              onImageClick={handleOpenImageModal}
             />
           </div>
         </div>
       </main>
       <Footer />
+      {selectedImageForModal && (
+        <ImageModal
+          imageUrl={selectedImageForModal}
+          onClose={handleCloseImageModal}
+        />
+      )}
     </div>
   );
 }

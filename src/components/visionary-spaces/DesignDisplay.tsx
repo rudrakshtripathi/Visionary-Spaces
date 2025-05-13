@@ -1,7 +1,8 @@
+
 'use client';
 
 import Image from 'next/image';
-import { Download, ImageOff, Image as ImageIconLucide } from 'lucide-react';
+import { Download, ImageOff, Image as ImageIconLucide, Expand } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { LoadingSpinner } from './LoadingSpinner';
@@ -10,13 +11,13 @@ interface DesignDisplayProps {
   designs: string[];
   isLoading: boolean;
   hasAttemptedGeneration: boolean;
+  onImageClick: (imageUrl: string) => void;
 }
 
-export function DesignDisplay({ designs, isLoading, hasAttemptedGeneration }: DesignDisplayProps) {
+export function DesignDisplay({ designs, isLoading, hasAttemptedGeneration, onImageClick }: DesignDisplayProps) {
   const handleDownload = (dataUri: string, index: number) => {
     const link = document.createElement('a');
     link.href = dataUri;
-    // Attempt to infer file type from data URI, default to png
     const mimeTypeMatch = dataUri.match(/^data:(image\/[a-zA-Z]+);base64,/);
     const extension = mimeTypeMatch && mimeTypeMatch[1] ? mimeTypeMatch[1].split('/')[1] : 'png';
     link.download = `visionary_space_${index + 1}.${extension}`;
@@ -70,8 +71,11 @@ export function DesignDisplay({ designs, isLoading, hasAttemptedGeneration }: De
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {designs.map((designUri, index) => (
           <Card key={index} className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 group">
-            <CardContent className="p-0">
-              <div className="aspect-video relative bg-muted">
+            <CardContent className="p-0 relative">
+              <div 
+                className="aspect-video relative bg-muted cursor-pointer"
+                onClick={() => onImageClick(designUri)}
+              >
                 <Image
                   src={designUri}
                   alt={`Generated Design ${index + 1}`}
@@ -80,6 +84,9 @@ export function DesignDisplay({ designs, isLoading, hasAttemptedGeneration }: De
                   className="group-hover:scale-105 transition-transform duration-300"
                   data-ai-hint="modern living room"
                 />
+                <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Expand className="h-10 w-10 text-white" />
+                </div>
               </div>
             </CardContent>
             <CardFooter className="p-4 bg-card">
