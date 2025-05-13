@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { generateInteriorDesignVariations, type GenerateInteriorDesignVariationsInput } from '@/ai/flows/generate-interior-design-variations';
@@ -209,50 +210,52 @@ export default function VisionarySpacesPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-background text-foreground">
-      <Header userName={userName} />
-      <main className="flex-1 container mx-auto py-8 px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          <div className="lg:col-span-5 flex flex-col gap-8">
-            <ImageUpload 
-              onImageUpload={handleImageUpload} 
-              currentImage={uploadedImage}
-              clearImage={clearImage}
-            />
-             <AiAnalysisDisplay
-              detectedRoomType={detectedRoomType}
-              detectedObjects={detectedObjects}
-              isDetectingRoom={isDetectingRoom}
-              isDetectingObjects={isDetectingObjects}
-              hasUploadedImage={!!uploadedImage}
-            />
-            <DesignForm
-              onSubmit={handleFormSubmit}
-              isLoading={isLoading}
-              hasUploadedImage={!!uploadedImage}
-              detectedRoomType={detectedRoomType}
-            />
+    <Suspense>
+      <div className="flex flex-col min-h-screen bg-background text-foreground">
+        <Header userName={userName} />
+        <main className="flex-1 container mx-auto py-8 px-4">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <div className="lg:col-span-5 flex flex-col gap-8">
+              <ImageUpload 
+                onImageUpload={handleImageUpload} 
+                currentImage={uploadedImage}
+                clearImage={clearImage}
+              />
+               <AiAnalysisDisplay
+                detectedRoomType={detectedRoomType}
+                detectedObjects={detectedObjects}
+                isDetectingRoom={isDetectingRoom}
+                isDetectingObjects={isDetectingObjects}
+                hasUploadedImage={!!uploadedImage}
+              />
+              <DesignForm
+                onSubmit={handleFormSubmit}
+                isLoading={isLoading}
+                hasUploadedImage={!!uploadedImage}
+                detectedRoomType={detectedRoomType}
+              />
+            </div>
+            
+            <div className="lg:col-span-7">
+              <DesignDisplay
+                designs={generatedDesigns}
+                isLoading={isLoading}
+                hasAttemptedGeneration={hasAttemptedGeneration}
+                onImageClick={handleOpenImageModal}
+                uploadedImage={uploadedImage} 
+                onGenerateMore={handleGenerateMore}
+              />
+            </div>
           </div>
-          
-          <div className="lg:col-span-7">
-            <DesignDisplay
-              designs={generatedDesigns}
-              isLoading={isLoading}
-              hasAttemptedGeneration={hasAttemptedGeneration}
-              onImageClick={handleOpenImageModal}
-              uploadedImage={uploadedImage} 
-              onGenerateMore={handleGenerateMore}
-            />
-          </div>
-        </div>
-      </main>
-      <Footer />
-      {selectedImageForModal && (
-        <ImageModal
-          imageUrl={selectedImageForModal}
-          onClose={handleCloseImageModal}
-        />
-      )}
-    </div>
+        </main>
+        <Footer />
+        {selectedImageForModal && (
+          <ImageModal
+            imageUrl={selectedImageForModal}
+            onClose={handleCloseImageModal}
+          />
+        )}
+      </div>
+    </Suspense>
   );
 }
