@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -94,18 +95,24 @@ export default function VisionarySpacesPage() {
       <main className="flex-1 container mx-auto py-8 px-4">
         <div className="flex flex-col gap-12"> {/* Main vertical stacking container */}
           
-          {/* Section 1: Inputs - Image Upload and Design Form */}
-          <div className="w-full max-w-2xl mx-auto space-y-8"> {/* Centered input section with max-width */}
-            <ImageUpload 
-              onImageUpload={handleImageUpload} 
-              currentImage={uploadedImage}
-              clearImage={clearImage}
-            />
-            <DesignForm
-              onSubmit={handleFormSubmit}
-              isLoading={isLoading}
-              hasUploadedImage={!!uploadedImage}
-            />
+          {/* Section 1: Inputs - Image Upload (left) and Design Form (right) */}
+          <div className="w-full flex flex-col lg:flex-row gap-8 items-start"> {/* Side-by-side on large screens, stacks on smaller */}
+            {/* Column 1: Image Upload */}
+            <div className="w-full lg:w-1/2"> {/* Takes half width on large screens */}
+              <ImageUpload 
+                onImageUpload={handleImageUpload} 
+                currentImage={uploadedImage}
+                clearImage={clearImage}
+              />
+            </div>
+            {/* Column 2: Design Form */}
+            <div className="w-full lg:w-1/2"> {/* Takes half width on large screens */}
+              <DesignForm
+                onSubmit={handleFormSubmit}
+                isLoading={isLoading}
+                hasUploadedImage={!!uploadedImage}
+              />
+            </div>
           </div>
           
           {/* Section 2: Outputs - Design Display */}
