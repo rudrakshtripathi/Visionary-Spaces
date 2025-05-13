@@ -2,7 +2,7 @@
 'use client';
 
 import Image from 'next/image';
-import { Download, ImageOff, Image as ImageIconLucide, Expand } from 'lucide-react';
+import { Download, ImageOff, Image as ImageIconLucide, Expand, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { LoadingSpinner } from './LoadingSpinner';
@@ -15,6 +15,7 @@ interface DesignDisplayProps {
   hasAttemptedGeneration: boolean;
   onImageClick: (imageUrl: string) => void;
   uploadedImage: string | null; 
+  onGenerateMore: () => void;
 }
 
 const inspiringQuotes = [
@@ -30,7 +31,7 @@ const inspiringQuotes = [
   "Because every corner tells a story."
 ];
 
-export function DesignDisplay({ designs, isLoading, hasAttemptedGeneration, onImageClick, uploadedImage }: DesignDisplayProps) {
+export function DesignDisplay({ designs, isLoading, hasAttemptedGeneration, onImageClick, uploadedImage, onGenerateMore }: DesignDisplayProps) {
   const [currentQuote, setCurrentQuote] = useState(inspiringQuotes[0]);
 
   useEffect(() => {
@@ -69,7 +70,7 @@ export function DesignDisplay({ designs, isLoading, hasAttemptedGeneration, onIm
 
   if (!hasAttemptedGeneration && designs.length === 0) {
     return (
-       <Card className="flex-1 w-full flex flex-col items-start justify-center min-h-[400px] bg-secondary/30 border-dashed"> 
+       <Card className="flex-1 w-full flex flex-col items-start justify-center min-h-[400px] bg-secondary/30 border-dashed p-6"> 
         <CardHeader> 
             <ImageIconLucide className="w-16 h-16 text-muted-foreground mb-4" data-ai-hint="interior design blueprint" /> 
             <CardTitle className="text-2xl">Your Designs Will Appear Here</CardTitle>
@@ -81,7 +82,7 @@ export function DesignDisplay({ designs, isLoading, hasAttemptedGeneration, onIm
   
   if (hasAttemptedGeneration && designs.length === 0 && !isLoading) {
     return (
-      <Card className="flex-1 w-full flex flex-col items-start justify-center min-h-[400px] shadow-lg"> 
+      <Card className="flex-1 w-full flex flex-col items-start justify-center min-h-[400px] shadow-lg p-6"> 
         <CardHeader> 
           <ImageOff className="w-16 h-16 text-destructive mb-4" /> 
           <CardTitle className="text-2xl">No Designs Generated</CardTitle>
@@ -94,55 +95,68 @@ export function DesignDisplay({ designs, isLoading, hasAttemptedGeneration, onIm
 
   if (designs.length > 0 && !isLoading) {
     return (
-      <div className="w-full">
-        <h2 className="text-2xl font-semibold mb-6 text-foreground">Generated Designs</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 gap-6"> {/* Adjusted to 2 columns for xl and 2xl for better fit */}
-          {designs.map((designUri, index) => (
-            <Card key={index} className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col">
-              <CardContent className="p-0 relative flex-grow">
-                {uploadedImage ? (
-                  <BeforeAfterSlider 
-                    beforeImage={uploadedImage} 
-                    afterImage={designUri}
-                    altBefore={`Original space for design ${index + 1}`}
-                    altAfter={`Generated Design ${index + 1}`}
-                  />
-                ) : (
-                  <div className="aspect-video relative bg-muted">
-                    <Image
-                      src={designUri}
-                      alt={`Generated Design ${index + 1}`}
-                      layout="fill"
-                      objectFit="cover"
-                      data-ai-hint="modern living room"
+      <Card className="w-full shadow-lg">
+         <CardHeader className="flex flex-row items-center justify-between pb-4">
+          <div>
+            <CardTitle className="text-2xl font-semibold text-foreground">Generated Designs</CardTitle>
+            <CardDescription>Compare original with AI redesigns, or generate more.</CardDescription>
+          </div>
+          {uploadedImage && designs.length > 0 && !isLoading && (
+            <Button onClick={onGenerateMore} variant="outline" size="sm" disabled={isLoading}>
+              <Sparkles className="mr-2 h-4 w-4" />
+              Generate More
+            </Button>
+          )}
+        </CardHeader>
+        <CardContent className="pt-0"> {/* Adjusted padding for CardContent */}
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 gap-6"> {/* Adjusted to 2 columns for xl and 2xl for better fit */}
+            {designs.map((designUri, index) => (
+              <Card key={index} className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col">
+                <CardContent className="p-0 relative flex-grow">
+                  {uploadedImage ? (
+                    <BeforeAfterSlider 
+                      beforeImage={uploadedImage} 
+                      afterImage={designUri}
+                      altBefore={`Original space for design ${index + 1}`}
+                      altAfter={`Generated Design ${index + 1}`}
                     />
-                  </div>
-                )}
-              </CardContent>
-              <CardFooter className="p-3 sm:p-4 bg-card border-t flex justify-between items-center gap-2">
-                <Button
-                  onClick={() => handleDownload(designUri, index)}
-                  variant="outline"
-                  size="sm"
-                  className="flex-1"
-                >
-                  <Download className="mr-1.5 sm:mr-2 h-4 w-4" />
-                  Download
-                </Button>
-                <Button
-                  onClick={() => onImageClick(designUri)}
-                  variant="outline"
-                  size="sm"
-                  className="flex-1"
-                >
-                  <Expand className="mr-1.5 sm:mr-2 h-4 w-4" />
-                  Expand
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
-      </div>
+                  ) : (
+                    <div className="aspect-video relative bg-muted">
+                      <Image
+                        src={designUri}
+                        alt={`Generated Design ${index + 1}`}
+                        layout="fill"
+                        objectFit="cover"
+                        data-ai-hint="modern living room"
+                      />
+                    </div>
+                  )}
+                </CardContent>
+                <CardFooter className="p-3 sm:p-4 bg-card border-t flex justify-between items-center gap-2">
+                  <Button
+                    onClick={() => handleDownload(designUri, index)}
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                  >
+                    <Download className="mr-1.5 sm:mr-2 h-4 w-4" />
+                    Download
+                  </Button>
+                  <Button
+                    onClick={() => onImageClick(designUri)}
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                  >
+                    <Expand className="mr-1.5 sm:mr-2 h-4 w-4" />
+                    Expand
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 

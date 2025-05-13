@@ -31,6 +31,8 @@ export default function VisionarySpacesPage() {
   const [detectedObjects, setDetectedObjects] = useState<Array<{ name: string }> | null>(null);
   const [isDetectingRoom, setIsDetectingRoom] = useState(false);
   const [isDetectingObjects, setIsDetectingObjects] = useState(false);
+  const [lastDesignFormValues, setLastDesignFormValues] = useState<DesignFormValues | null>(null);
+
 
   const { toast } = useToast();
 
@@ -115,6 +117,7 @@ export default function VisionarySpacesPage() {
     setUploadedImage(dataUri);
     setGeneratedDesigns([]); 
     setHasAttemptedGeneration(false);
+    setLastDesignFormValues(null); // Clear last form values on new image upload
     performAiAnalysis(dataUri);
   };
 
@@ -126,6 +129,7 @@ export default function VisionarySpacesPage() {
     setDetectedObjects(null);
     setIsDetectingRoom(false);
     setIsDetectingObjects(false);
+    setLastDesignFormValues(null);
   }
 
   const handleFormSubmit = async (data: DesignFormValues) => {
@@ -137,7 +141,7 @@ export default function VisionarySpacesPage() {
       });
       return;
     }
-
+    setLastDesignFormValues(data); // Store the current form values
     setIsLoading(true);
     setGeneratedDesigns([]);
     setHasAttemptedGeneration(true);
@@ -182,6 +186,20 @@ export default function VisionarySpacesPage() {
     }
   };
 
+  const handleGenerateMore = async () => {
+    if (lastDesignFormValues) {
+      await handleFormSubmit(lastDesignFormValues);
+    } else {
+      // This case should ideally not be reached if button is shown conditionally
+      toast({
+        title: 'No Previous Settings',
+        description: 'Please submit the form once to generate more variations.',
+        variant: 'default',
+      });
+    }
+  };
+
+
   const handleOpenImageModal = (imageUrl: string) => {
     setSelectedImageForModal(imageUrl);
   };
@@ -223,6 +241,7 @@ export default function VisionarySpacesPage() {
               hasAttemptedGeneration={hasAttemptedGeneration}
               onImageClick={handleOpenImageModal}
               uploadedImage={uploadedImage} 
+              onGenerateMore={handleGenerateMore}
             />
           </div>
         </div>
