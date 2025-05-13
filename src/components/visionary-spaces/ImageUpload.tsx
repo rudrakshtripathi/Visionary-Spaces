@@ -113,7 +113,7 @@ export function ImageUpload({ onImageUpload, currentImage, clearImage }: ImageUp
     <Card className="overflow-hidden">
       <CardHeader>
         <CardTitle>Upload Your Space</CardTitle>
-        <CardDescription>Let's start by uploading a photo of the room you want to transform.</CardDescription>
+        <CardDescription>Let's start by uploading a photo of the room you want to transform. Ensure the image has proper lighting for best results.</CardDescription>
       </CardHeader>
       <CardContent>
         {currentImage ? (
@@ -167,3 +167,4 @@ export function ImageUpload({ onImageUpload, currentImage, clearImage }: ImageUp
     </Card>
   );
 }
+
