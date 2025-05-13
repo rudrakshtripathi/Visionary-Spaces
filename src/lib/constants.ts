@@ -1,0 +1,48 @@
+export const ROOM_TYPES = [
+  "Living Room",
+  "Bedroom",
+  "Kitchen",
+  "Bathroom",
+  "Office",
+  "Dining Room",
+  "Outdoor Patio",
+  "Kids Room",
+  "Nursery",
+  "Hallway",
+  "Basement",
+  "Attic",
+  "Garage",
+  "Entryway",
+  "Laundry Room",
+  "Sunroom",
+  "Home Gym",
+  "Playroom",
+  "Guest Room",
+  "Studio Apartment",
+] as const;
+
+export const DESIGN_STYLES = [
+  "Minimalist",
+  "Scandinavian",
+  "Modern",
+  "Bohemian (Boho)",
+  "Industrial",
+  "Farmhouse (Modern Farmhouse)",
+  "Coastal (Hamptons)",
+  "Mid-Century Modern",
+  "Art Deco",
+  "Traditional",
+  "Contemporary",
+  "Rustic",
+  "Shabby Chic",
+  "Hollywood Glam",
+  "Japandi",
+  "Biophilic",
+  "Maximalist",
+  "Eclectic",
+  "Transitional",
+  "Tropical",
+] as const;
+
+export type RoomType = typeof ROOM_TYPES[number];
+export type DesignStyle = typeof DESIGN_STYLES[number];
