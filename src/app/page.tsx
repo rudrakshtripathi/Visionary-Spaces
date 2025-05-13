@@ -137,6 +137,10 @@ export default function VisionarySpacesPage() {
       photoDataUri: uploadedImage,
       roomType: data.roomType,
       interiorDesignStyle: data.interiorDesignStyle,
+      colorPalette: data.colorPalette || undefined,
+      furnitureStyle: data.furnitureStyle || undefined,
+      budgetLevel: data.budgetLevel || undefined,
+      lightingPreference: data.lightingPreference || undefined,
       designDescription: data.designDescription || undefined,
     };
 
@@ -182,7 +186,6 @@ export default function VisionarySpacesPage() {
       <Header />
       <main className="flex-1 container mx-auto py-8 px-4">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Left Column: Image Upload, AI Analysis and Design Form */}
           <div className="lg:col-span-5 flex flex-col gap-8">
             <ImageUpload 
               onImageUpload={handleImageUpload} 
@@ -204,7 +207,6 @@ export default function VisionarySpacesPage() {
             />
           </div>
           
-          {/* Right Column: Design Display */}
           <div className="lg:col-span-7">
             <DesignDisplay
               designs={generatedDesigns}
