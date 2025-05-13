@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -93,8 +92,10 @@ export default function VisionarySpacesPage() {
     <div className="flex flex-col min-h-screen bg-background text-foreground">
       <Header />
       <main className="flex-1 container mx-auto py-8 px-4">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
-          <div className="md:col-span-5 lg:col-span-4 space-y-8 sticky top-8">
+        <div className="flex flex-col gap-12"> {/* Main vertical stacking container */}
+          
+          {/* Section 1: Inputs - Image Upload and Design Form */}
+          <div className="w-full max-w-2xl mx-auto space-y-8"> {/* Centered input section with max-width */}
             <ImageUpload 
               onImageUpload={handleImageUpload} 
               currentImage={uploadedImage}
@@ -106,7 +107,9 @@ export default function VisionarySpacesPage() {
               hasUploadedImage={!!uploadedImage}
             />
           </div>
-          <div className="md:col-span-7 lg:col-span-8">
+          
+          {/* Section 2: Outputs - Design Display */}
+          <div className="w-full"> {/* Design display takes full width of container */}
             <DesignDisplay
               designs={generatedDesigns}
               isLoading={isLoading}
@@ -114,6 +117,7 @@ export default function VisionarySpacesPage() {
               onImageClick={handleOpenImageModal}
             />
           </div>
+
         </div>
       </main>
       <Footer />

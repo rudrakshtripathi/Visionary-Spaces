@@ -67,7 +67,7 @@ export function DesignDisplay({ designs, isLoading, hasAttemptedGeneration, onIm
   // When designs are present and not loading
   if (designs.length > 0 && !isLoading) {
     return (
-      <div className="w-full pt-0 md:pt-6"> {/* Adjusted padding: No top padding on mobile, pt-6 on md+ to align with CardHeaders */}
+      <div className="w-full"> {/* Removed conditional top padding */}
         <h2 className="text-2xl font-semibold mb-6 text-foreground">Generated Designs</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {designs.map((designUri, index) => (
