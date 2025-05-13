@@ -1,230 +1,61 @@
-
 'use client';
 
-import { useState, useEffect } from 'react';
-import { generateInteriorDesignVariations, type GenerateInteriorDesignVariationsInput } from '@/ai/flows/generate-interior-design-variations';
-import { detectRoomType, type DetectRoomTypeInput } from '@/ai/flows/detect-room-type-flow';
-import { detectObjects, type DetectObjectsInput } from '@/ai/flows/detect-objects-flow';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Palette, Sparkles } from 'lucide-react';
 
-import { Header } from '@/components/visionary-spaces/Header';
-import { Footer } from '@/components/visionary-spaces/Footer';
-import { ImageUpload } from '@/components/visionary-spaces/ImageUpload';
-import { DesignForm, type DesignFormValues } from '@/components/visionary-spaces/DesignForm';
-import { DesignDisplay } from '@/components/visionary-spaces/DesignDisplay';
-import { ImageModal } from '@/components/visionary-spaces/ImageModal';
-import { AiAnalysisDisplay } from '@/components/visionary-spaces/AiAnalysisDisplay';
-import { useToast } from '@/hooks/use-toast';
-import type { RoomType } from '@/lib/constants';
-import { ROOM_TYPES } from '@/lib/constants';
+export default function WelcomePage() {
+  const [userName, setUserName] = useState('');
+  const router = useRouter();
 
-
-export default function VisionarySpacesPage() {
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
-  const [generatedDesigns, setGeneratedDesigns] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasAttemptedGeneration, setHasAttemptedGeneration] = useState(false);
-  const [selectedImageForModal, setSelectedImageForModal] = useState<string | null>(null);
-  
-  const [detectedRoomType, setDetectedRoomType] = useState<RoomType | null>(null);
-  const [detectedObjects, setDetectedObjects] = useState<Array<{ name: string }> | null>(null);
-  const [isDetectingRoom, setIsDetectingRoom] = useState(false);
-  const [isDetectingObjects, setIsDetectingObjects] = useState(false);
-
-  const { toast } = useToast();
-
-  const performAiAnalysis = async (dataUri: string) => {
-    setIsDetectingRoom(true);
-    setIsDetectingObjects(true);
-    setDetectedRoomType(null);
-    setDetectedObjects(null);
-
-    try {
-      const roomTypePromise = detectRoomType({ photoDataUri: dataUri });
-      const objectsPromise = detectObjects({ photoDataUri: dataUri });
-
-      const [roomResult, objectsResult] = await Promise.allSettled([roomTypePromise, objectsPromise]);
-
-      if (roomResult.status === 'fulfilled' && roomResult.value.roomType && ROOM_TYPES.includes(roomResult.value.roomType as any)) {
-        setDetectedRoomType(roomResult.value.roomType as RoomType);
-         toast({
-          title: 'Room Type Detected',
-          description: `AI identified the room as: ${roomResult.value.roomType}`,
-        });
-      } else {
-        setDetectedRoomType(null);
-        const errorMsg = roomResult.status === 'rejected' ? (roomResult.reason as Error).message : 'Could not determine room type.';
-        console.warn('Room type detection failed or invalid:', errorMsg);
-        toast({
-          title: 'Room Type Detection',
-          description: 'Could not automatically detect the room type.',
-          variant: 'default',
-        });
-      }
-      
-      if (objectsResult.status === 'fulfilled' && objectsResult.value.detectedObjects) {
-        setDetectedObjects(objectsResult.value.detectedObjects);
-        if (objectsResult.value.detectedObjects.length > 0) {
-          toast({
-            title: 'Objects Detected',
-            description: `AI identified ${objectsResult.value.detectedObjects.length} object(s) in the image.`,
-          });
-        } else {
-           toast({
-            title: 'Object Detection',
-            description: 'No specific objects were identified by the AI.',
-            variant: 'default',
-          });
-        }
-      } else {
-        setDetectedObjects(null);
-        const errorMsg = objectsResult.status === 'rejected' ? (objectsResult.reason as Error).message : 'Object detection failed.';
-        console.warn('Object detection failed:', errorMsg);
-         toast({
-          title: 'Object Detection Failed',
-          description: 'Could not identify objects in the image.',
-          variant: 'destructive',
-        });
-      }
-
-    } catch (error) {
-      console.error('Error during AI analysis:', error);
-      toast({
-        title: 'AI Analysis Error',
-        description: 'An error occurred while analyzing the image.',
-        variant: 'destructive',
-      });
-      setDetectedRoomType(null);
-      setDetectedObjects(null);
-    } finally {
-      setIsDetectingRoom(false);
-      setIsDetectingObjects(false);
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (userName.trim()) {
+      router.push(`/design?name=${encodeURIComponent(userName.trim())}`);
     }
-  };
-
-
-  const handleImageUpload = (dataUri: string) => {
-    setUploadedImage(dataUri);
-    setGeneratedDesigns([]); 
-    setHasAttemptedGeneration(false);
-    performAiAnalysis(dataUri);
-  };
-
-  const clearImage = () => {
-    setUploadedImage(null);
-    setGeneratedDesigns([]);
-    setHasAttemptedGeneration(false);
-    setDetectedRoomType(null);
-    setDetectedObjects(null);
-    setIsDetectingRoom(false);
-    setIsDetectingObjects(false);
-  }
-
-  const handleFormSubmit = async (data: DesignFormValues) => {
-    if (!uploadedImage) {
-      toast({
-        title: 'No Image Uploaded',
-        description: 'Please upload an image of your space first.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    setIsLoading(true);
-    setGeneratedDesigns([]);
-    setHasAttemptedGeneration(true);
-
-    const input: GenerateInteriorDesignVariationsInput = {
-      photoDataUri: uploadedImage,
-      roomType: data.roomType,
-      interiorDesignStyle: data.interiorDesignStyle,
-      colorPalette: data.colorPalette || undefined,
-      furnitureStyle: data.furnitureStyle || undefined,
-      budgetLevel: data.budgetLevel || undefined,
-      lightingPreference: data.lightingPreference || undefined,
-      designDescription: data.designDescription || undefined,
-    };
-
-    try {
-      const result = await generateInteriorDesignVariations(input);
-      if (result.redesignedImages && result.redesignedImages.length > 0) {
-        setGeneratedDesigns(result.redesignedImages);
-        toast({
-          title: 'Designs Generated!',
-          description: 'Your visionary spaces are ready.',
-        });
-      } else {
-        setGeneratedDesigns([]);
-         toast({
-          title: 'No Designs Returned',
-          description: 'The AI didn\'t return any designs. Try adjusting your prompt.',
-          variant: 'default',
-        });
-      }
-    } catch (error) {
-      console.error('Error generating designs:', error);
-      setGeneratedDesigns([]);
-      toast({
-        title: 'Error Generating Designs',
-        description: (error instanceof Error ? error.message : String(error)) || 'An unexpected error occurred. Please try again.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleOpenImageModal = (imageUrl: string) => {
-    setSelectedImageForModal(imageUrl);
-  };
-
-  const handleCloseImageModal = () => {
-    setSelectedImageForModal(null);
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-background text-foreground">
-      <Header />
-      <main className="flex-1 container mx-auto py-8 px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          <div className="lg:col-span-5 flex flex-col gap-8">
-            <ImageUpload 
-              onImageUpload={handleImageUpload} 
-              currentImage={uploadedImage}
-              clearImage={clearImage}
-            />
-             <AiAnalysisDisplay
-              detectedRoomType={detectedRoomType}
-              detectedObjects={detectedObjects}
-              isDetectingRoom={isDetectingRoom}
-              isDetectingObjects={isDetectingObjects}
-              hasUploadedImage={!!uploadedImage}
-            />
-            <DesignForm
-              onSubmit={handleFormSubmit}
-              isLoading={isLoading}
-              hasUploadedImage={!!uploadedImage}
-              detectedRoomType={detectedRoomType}
-            />
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-background to-secondary/30 p-4">
+      <Card className="w-full max-w-md shadow-2xl rounded-lg">
+        <CardHeader className="text-center">
+          <div className="flex justify-center items-center mb-4">
+            <Palette className="h-12 w-12 text-primary" />
           </div>
-          
-          <div className="lg:col-span-7">
-            <DesignDisplay
-              designs={generatedDesigns}
-              isLoading={isLoading}
-              hasAttemptedGeneration={hasAttemptedGeneration}
-              onImageClick={handleOpenImageModal}
-              uploadedImage={uploadedImage} 
+          <CardTitle className="text-3xl font-bold">Welcome to Visionary Spaces</CardTitle>
+          <CardDescription className="text-md text-muted-foreground pt-2">
+            Enter your name and let's begin your journey of imagination.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <Input
+              type="text"
+              placeholder="Your Name"
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
+              className="h-12 text-lg"
+              required
+              aria-label="Your Name"
             />
-          </div>
-        </div>
-      </main>
-      <Footer />
-      {selectedImageForModal && (
-        <ImageModal
-          imageUrl={selectedImageForModal}
-          onClose={handleCloseImageModal}
-        />
-      )}
+            <Button type="submit" className="w-full h-12 text-lg" disabled={!userName.trim()}>
+              <Sparkles className="mr-2 h-5 w-5" />
+              Begin Your Imagination
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+      <footer className="py-6 mt-8 text-center">
+        <p className="text-sm text-muted-foreground">
+          &copy; {new Date().getFullYear()} Visionary Spaces.
+        </p>
+         <p className="text-sm text-muted-foreground mt-1">
+          <strong>Created by Rudraksh Tripathi</strong>
+        </p>
+      </footer>
     </div>
   );
 }
