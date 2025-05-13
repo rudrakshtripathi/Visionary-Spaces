@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Palette, Sparkles } from 'lucide-react';
+import { Footer } from '@/components/visionary-spaces/Footer'; // Import Footer
 
 export default function WelcomePage() {
   const [userName, setUserName] = useState('');
@@ -62,14 +63,8 @@ export default function WelcomePage() {
           </CardContent>
         </Card>
       </main>
-      <footer className="z-10 py-6 mt-8 text-center">
-        <p className="text-sm text-muted-foreground">
-          &copy; {new Date().getFullYear()} Visionary Spaces.
-        </p>
-         <p className="text-sm text-muted-foreground mt-1">
-          <strong>Created by Rudraksh Tripathi</strong>
-        </p>
-      </footer>
+      <Footer /> {/* Use Footer component */}
     </div>
   );
 }
+
