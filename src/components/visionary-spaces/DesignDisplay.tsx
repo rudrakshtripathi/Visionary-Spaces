@@ -1,3 +1,4 @@
+
 'use client';
 
 import Image from 'next/image';
@@ -5,21 +6,48 @@ import { Download, ImageOff, Image as ImageIconLucide, Expand } from 'lucide-rea
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { LoadingSpinner } from './LoadingSpinner';
+import { BeforeAfterSlider } from './BeforeAfterSlider'; // Import the new component
+import { useEffect, useState } from 'react';
 
 interface DesignDisplayProps {
   designs: string[];
   isLoading: boolean;
   hasAttemptedGeneration: boolean;
   onImageClick: (imageUrl: string) => void;
+  uploadedImage: string | null; // Add uploadedImage prop
 }
 
-export function DesignDisplay({ designs, isLoading, hasAttemptedGeneration, onImageClick }: DesignDisplayProps) {
+const inspiringQuotes = [
+  "Redesign the space. Redefine the vibe.",
+  "Where AI meets aesthetic — your dream space awaits.",
+  "Transform your room with a single click.",
+  "Smart interiors, stunning results.",
+  "Design beyond imagination — powered by AI.",
+  "Upload. Imagine. Live beautifully.",
+  "Your room deserves more than just walls.",
+  "Style your space with the magic of AI.",
+  "AI-crafted spaces. Human-inspired comfort.",
+  "Because every corner tells a story."
+];
+
+export function DesignDisplay({ designs, isLoading, hasAttemptedGeneration, onImageClick, uploadedImage }: DesignDisplayProps) {
+  const [currentQuote, setCurrentQuote] = useState(inspiringQuotes[0]);
+
+  useEffect(() => {
+    if (isLoading) {
+      const intervalId = setInterval(() => {
+        setCurrentQuote(inspiringQuotes[Math.floor(Math.random() * inspiringQuotes.length)]);
+      }, 3000); // Change quote every 3 seconds
+      return () => clearInterval(intervalId);
+    }
+  }, [isLoading]);
+
   const handleDownload = (dataUri: string, index: number) => {
     const link = document.createElement('a');
     link.href = dataUri;
     const mimeTypeMatch = dataUri.match(/^data:(image\/[a-zA-Z]+);base64,/);
     const extension = mimeTypeMatch && mimeTypeMatch[1] ? mimeTypeMatch[1].split('/')[1] : 'png';
-    link.download = `visionary_space_${index + 1}.${extension}`;
+    link.download = `visionary_space_generated_${index + 1}.${extension}`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -27,10 +55,10 @@ export function DesignDisplay({ designs, isLoading, hasAttemptedGeneration, onIm
 
   if (isLoading) {
     return (
-      <Card className="flex-1 w-full flex flex-col items-center justify-center min-h-[400px] shadow-lg animate-pulse">
+      <Card className="flex-1 w-full flex flex-col items-center justify-center min-h-[400px] shadow-lg">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Conjuring Your Visions...</CardTitle>
-          <CardDescription>Our AI is hard at work crafting your new spaces. This might take a moment.</CardDescription>
+          <CardTitle className="text-2xl mb-2">Conjuring Your Visions...</CardTitle>
+          <CardDescription className="italic text-muted-foreground min-h-[40px]">{currentQuote}</CardDescription>
         </CardHeader>
         <CardContent>
           <LoadingSpinner size={64} />
@@ -64,40 +92,52 @@ export function DesignDisplay({ designs, isLoading, hasAttemptedGeneration, onIm
   }
 
 
-  // When designs are present and not loading
   if (designs.length > 0 && !isLoading) {
     return (
-      <div className="w-full"> {/* Removed conditional top padding */}
+      <div className="w-full">
         <h2 className="text-2xl font-semibold mb-6 text-foreground">Generated Designs</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {designs.map((designUri, index) => (
-            <Card key={index} className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 group">
-              <CardContent className="p-0 relative">
-                <div 
-                  className="aspect-video relative bg-muted cursor-pointer"
-                  onClick={() => onImageClick(designUri)}
-                >
-                  <Image
-                    src={designUri}
-                    alt={`Generated Design ${index + 1}`}
-                    layout="fill"
-                    objectFit="cover"
-                    className="group-hover:scale-105 transition-transform duration-300"
-                    data-ai-hint="modern living room"
+            <Card key={index} className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col">
+              <CardContent className="p-0 relative flex-grow">
+                {uploadedImage ? (
+                  <BeforeAfterSlider 
+                    beforeImage={uploadedImage} 
+                    afterImage={designUri}
+                    altBefore={`Original space for design ${index + 1}`}
+                    altAfter={`Generated Design ${index + 1}`}
                   />
-                  <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <Expand className="h-10 w-10 text-white" />
+                ) : (
+                  // Fallback if original image is somehow not available for the slider
+                  <div className="aspect-video relative bg-muted">
+                    <Image
+                      src={designUri}
+                      alt={`Generated Design ${index + 1}`}
+                      layout="fill"
+                      objectFit="cover"
+                      data-ai-hint="modern living room"
+                    />
                   </div>
-                </div>
+                )}
               </CardContent>
-              <CardFooter className="p-4 bg-card">
+              <CardFooter className="p-3 sm:p-4 bg-card border-t flex justify-between items-center gap-2">
                 <Button
                   onClick={() => handleDownload(designUri, index)}
-                  className="w-full"
                   variant="outline"
+                  size="sm"
+                  className="flex-1"
                 >
-                  <Download className="mr-2 h-4 w-4" />
-                  Download Design {index + 1}
+                  <Download className="mr-1.5 sm:mr-2 h-4 w-4" />
+                  Download
+                </Button>
+                <Button
+                  onClick={() => onImageClick(designUri)}
+                  variant="outline"
+                  size="sm"
+                  className="flex-1"
+                >
+                  <Expand className="mr-1.5 sm:mr-2 h-4 w-4" />
+                  Expand
                 </Button>
               </CardFooter>
             </Card>
@@ -107,6 +147,5 @@ export function DesignDisplay({ designs, isLoading, hasAttemptedGeneration, onIm
     );
   }
 
-  // Fallback for any other unaccounted state, though unlikely to be hit with current logic
   return null; 
 }

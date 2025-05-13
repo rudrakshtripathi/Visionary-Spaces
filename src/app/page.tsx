@@ -21,7 +21,7 @@ export default function VisionarySpacesPage() {
 
   const handleImageUpload = (dataUri: string) => {
     setUploadedImage(dataUri);
-    setGeneratedDesigns([]); // Clear previous designs when a new image is uploaded
+    setGeneratedDesigns([]); 
     setHasAttemptedGeneration(false);
   };
 
@@ -93,38 +93,31 @@ export default function VisionarySpacesPage() {
     <div className="flex flex-col min-h-screen bg-background text-foreground">
       <Header />
       <main className="flex-1 container mx-auto py-8 px-4">
-        <div className="flex flex-col gap-12"> {/* Main vertical stacking container */}
-          
-          {/* Section 1: Inputs - Image Upload (left) and Design Form (right) */}
-          <div className="w-full flex flex-col lg:flex-row gap-8 items-start"> {/* Side-by-side on large screens, stacks on smaller */}
-            {/* Column 1: Image Upload */}
-            <div className="w-full lg:w-1/2"> {/* Takes half width on large screens */}
-              <ImageUpload 
-                onImageUpload={handleImageUpload} 
-                currentImage={uploadedImage}
-                clearImage={clearImage}
-              />
-            </div>
-            {/* Column 2: Design Form */}
-            <div className="w-full lg:w-1/2"> {/* Takes half width on large screens */}
-              <DesignForm
-                onSubmit={handleFormSubmit}
-                isLoading={isLoading}
-                hasUploadedImage={!!uploadedImage}
-              />
-            </div>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Left Column: Image Upload and Design Form */}
+          <div className="lg:col-span-5 flex flex-col gap-8">
+            <ImageUpload 
+              onImageUpload={handleImageUpload} 
+              currentImage={uploadedImage}
+              clearImage={clearImage}
+            />
+            <DesignForm
+              onSubmit={handleFormSubmit}
+              isLoading={isLoading}
+              hasUploadedImage={!!uploadedImage}
+            />
           </div>
           
-          {/* Section 2: Outputs - Design Display */}
-          <div className="w-full"> {/* Design display takes full width of container */}
+          {/* Right Column: Design Display */}
+          <div className="lg:col-span-7">
             <DesignDisplay
               designs={generatedDesigns}
               isLoading={isLoading}
               hasAttemptedGeneration={hasAttemptedGeneration}
               onImageClick={handleOpenImageModal}
+              uploadedImage={uploadedImage} 
             />
           </div>
-
         </div>
       </main>
       <Footer />
